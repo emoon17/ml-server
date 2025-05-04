@@ -1,71 +1,82 @@
 import joblib
 import numpy as np
+import traceback
 from flask import Flask, request, jsonify
-from datetime import datetime
+
+from ml.data.extract_from_db import save_data_to_csv
+from ml.data.train_model import load_data_from_csv, train_and_save_model
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello():
-    return "Hello, Flask!"
-
-
-# api 통신 테스트
-# @app.route("/predict", methods=["POST"])
-# def predict():
-#     data = request.get_json()
-#
-#     try:
-#         expected = datetime.strptime(data["expectedPaymentDate"], "%Y-%m-%d")
-#         recovered = datetime.strptime(data["recoveredDate"], "%Y-%m-%d")
-#         delay = (recovered - expected).days
-#         return jsonify({"delayDays" : max(delay, 0)})
-#     except Exception as e:
-#         return jsonify({"error" : str(e)}), 400
-
-# 모델, 인코더 불러오기
-model = joblib.load("ml/data/model.pkl")
-industry_encoder = joblib.load("ml/data/industry_encoder.pkl")
-
-
-@app.route("/ml/predict", methods=["POST"])
-def predict():
-    data = request.get_json()
-
+#  1. 학습 API (/ml/train) - 자정 스케줄러가 호출
+@app.route("/ml/train", methods=["POST"])
+def train_api():
     try:
-        # 필드 추출
-        amount = int(data["transactionAmount"])
+        save_data_to_csv()
+        df = load_data_from_csv()
+        train_and_save_model(df)
+        return jsonify({
+            "status": "success",
+            "message": "모델과 인코더가 성공적으로 저장되었습니다."
+        }), 200
+
+    except Exception as e:
+        print(" 학습 중 예외 발생:")
+        traceback.print_exc()  # 전체 에러 로그 터미널에 출력
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+#  2. 예측 API (/ml/predict) - 실시간 예측 요청
+@app.route("/ml/predict", methods=["POST"])
+def predict_api():
+    try:
+        # 저장된 모델 및 인코더 로드
+        model = joblib.load("model.pkl")
+        encoder = joblib.load("industry_encoder.pkl")
+
+        #  요청 데이터 파싱
+        data = request.get_json()
+        amount = float(data["transactionAmount"])
         industry = data["industry"]
         expected_days = int(data["expectedRecoveryDays"])
 
-        # 업종 인코딩 - 2D로 넣어야함ㅁ
-        industry_encoded = industry_encoder.transform([[industry]])
+        #  입력 데이터 인코딩
+        industry_encoded = encoder.transform([[industry]])
+        input_data = np.hstack([[amount, expected_days], industry_encoded[0]]).reshape(1, -1)
 
-        # 입력 벡터 구성
-        input_data = np.hstack([[amount, expected_days], industry_encoded[0]])
-        input_data = input_data.reshape(1, -1)  # (1, n_features)
-        
-        # 예측
+        #  예측
         predicted_delay = model.predict(input_data)[0]
 
-        # 위험도 분류
+        #  위험도 해석
         if predicted_delay <= 3:
             risk_level = "LOW"
-            comment = "회수가 지연 될 가능성이 낮습니다."
-        elif predicted_delay <= 7 :
+            comment = "회수가 지연될 가능성이 낮습니다."
+        elif predicted_delay <= 7:
             risk_level = "MEDIUM"
-            comment = "회수가 지연 될 수 있습니다."
+            comment = "회수가 지연될 수 있습니다."
         else:
             risk_level = "HIGH"
-            comment = "회수가 지연 될 가능성이 매우 높습니다."
+            comment = "회수가 지연될 가능성이 매우 높습니다."
 
         return jsonify({
             "predictedDelay": round(predicted_delay),
             "riskLevel": risk_level,
             "comment": comment
-        })
+        }), 200
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({
+            "error": str(e)
+        }), 400
+
+
+# 헬스 체크
+@app.route("/")
+def index():
+    return " Flask ML API 서버 작동 중 (/ml/train, /ml/predict)"
 
 
 if __name__ == "__main__":
