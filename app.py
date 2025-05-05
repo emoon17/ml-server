@@ -51,15 +51,15 @@ def predict_api():
         predicted_delay = model.predict(input_data)[0]
 
         #  위험도 해석
-        if predicted_delay <= 3:
-            risk_level = "LOW"
-            comment = "회수가 지연될 가능성이 낮습니다."
-        elif predicted_delay <= 7:
+        if predicted_delay >= 6:
+            risk_level = "HIGH"
+            comment = "회수가 지연될 가능성이 매우 높습니다."
+        elif predicted_delay >= 3:
             risk_level = "MEDIUM"
             comment = "회수가 지연될 수 있습니다."
         else:
-            risk_level = "HIGH"
-            comment = "회수가 지연될 가능성이 매우 높습니다."
+            risk_level = "LOW"
+            comment = "회수가 지연될 가능성이 낮습니다."
 
         return jsonify({
             "predictedDelay": round(predicted_delay),
