@@ -1,11 +1,12 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+
 def save_data_to_csv():
     db_config = {
         "user": "root",
         "password": "root",
-        "host": "localhost",
+        "host": "127.0.0.1",
         "port": "3306",
         "database": "recovery"
     }

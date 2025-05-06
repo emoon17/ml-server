@@ -1,0 +1,19 @@
+# 1) 베이스 이미지
+FROM python:3.10-slim
+
+# 2) 작업 디렉토리
+WORKDIR /app
+
+# 3) 의존성 복사 & 설치
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4) Flask 소스 복사
+COPY . .
+
+# 5) 실행
+#    app.py에 Flask app 변수를 'app'으로 export했다고 가정
+CMD ["gunicorn", "app:app", \
+     "-b", "0.0.0.0:5000", \
+     "--workers", "2", \
+     "--timeout", "120"]
