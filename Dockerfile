@@ -5,8 +5,13 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # 3) 의존성 복사 & 설치
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    Flask \
+    gunicorn \
+    python-dotenv \
+    sqlalchemy \
+    pymysql \
+    pandas
 
 # 4) Flask 소스 복사
 COPY . .
