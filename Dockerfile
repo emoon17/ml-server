@@ -12,7 +12,8 @@ RUN pip install --no-cache-dir \
     sqlalchemy \
     pymysql \
     pandas \
-    joblib
+    joblib \
+    scikit-learn
 
 # 4) Flask 소스 복사
 COPY . .

@@ -3,6 +3,7 @@ set -e
 
 echo "📦 Building Flask Docker image..."
 cd /home/ec2-user/ml-server
+git pull origin master
 docker build -t wehago_flask:latest .
 
 echo "🛑 Stopping old container (if any)..."
