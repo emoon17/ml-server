@@ -4,6 +4,11 @@ FROM python:3.10-slim
 # 2) 작업 디렉토리
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # 3) 의존성 복사 & 설치
 RUN pip install --no-cache-dir \
     Flask \
