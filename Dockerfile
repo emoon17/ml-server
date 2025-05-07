@@ -13,7 +13,8 @@ RUN pip install --no-cache-dir \
     pymysql \
     pandas \
     joblib \
-    scikit-learn
+    scikit-learn \
+    xgboost
 
 # 4) Flask 소스 복사
 COPY . .
