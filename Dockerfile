@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir \
     python-dotenv \
     sqlalchemy \
     pymysql \
-    pandas
+    pandas \
+    joblib
 
 # 4) Flask 소스 복사
 COPY . .
