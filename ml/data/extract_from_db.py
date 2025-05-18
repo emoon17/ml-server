@@ -28,5 +28,5 @@ def save_data_to_csv():
         f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
     )
     df = pd.read_sql(query, engine)
-    df.to_csv("/app/train_data.csv", index=False, encoding="utf-8-sig")
+    df.to_csv("train_data.csv", index=False, encoding="utf-8-sig")
     print("data 저장 완료")
