@@ -6,7 +6,7 @@ def save_data_to_csv():
     db_config = {
         "user": "root",
         "password": "Root123!",
-        "host": "13.209.126.76",
+        "host": "172.17.0.1",
         "port": "3306",
         "database": "recovery"
     }
