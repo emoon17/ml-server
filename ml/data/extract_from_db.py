@@ -25,7 +25,7 @@ def save_data_to_csv():
     """
 
     engine = create_engine(
-        "mysql+pymysql://root:Root123!@13.209.126.76:3306/recovery?charset=utf8mb4"
+        f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
     )
     df = pd.read_sql(query, engine)
     df.to_csv("train_data.csv", index=False, encoding="utf-8-sig")
