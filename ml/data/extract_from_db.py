@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 def save_data_to_csv():
     db_config = {
         "user": "root",
-        "password": "root",
+        "password": "Root123!",
         "host": "13.209.126.76",
         "port": "3306",
         "database": "recovery"
