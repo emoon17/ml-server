@@ -12,9 +12,16 @@ app = Flask(__name__)
 @app.route("/ml/train", methods=["POST"])
 def train_api():
     try:
+        print("[1] save_data_to_csv 시작")
         save_data_to_csv()
+        print("[2] load_data_from_csv 시작")
         df = load_data_from_csv()
+        print("[3] DataFrame 확인:")
+        print(df.head())  # 여기에 아무것도 없으면 문제!
+
+        print("[4] train_and_save_model 시작")
         train_and_save_model(df)
+
         return jsonify({
             "status": "success",
             "message": "모델과 인코더가 성공적으로 저장되었습니다."
@@ -22,7 +29,8 @@ def train_api():
 
     except Exception as e:
         print(" 학습 중 예외 발생:")
-        traceback.print_exc()  # 전체 에러 로그 터미널에 출력
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "status": "error",
             "message": str(e)
