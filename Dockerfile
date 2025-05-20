@@ -7,6 +7,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgomp1 \
+    gcc \
+    g++ \
+    libatlas-base-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 3) 의존성 복사 & 설치
