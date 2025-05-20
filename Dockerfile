@@ -20,7 +20,10 @@ RUN pip install --no-cache-dir \
     sqlalchemy \
     pymysql \
     pandas \
-    joblib \
+    joblib
+
+# 2차로 무거운 것 설치
+RUN pip install --no-cache-dir \
     scikit-learn \
     xgboost
 
