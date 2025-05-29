@@ -21,9 +21,9 @@ def save_data_to_csv():
         DATEDIFF(t.recovered_date, t.expected_payment_date) AS delayDays
     FROM transaction t
     JOIN client c ON t.client_id = c.client_id
-    WHERE t.recovered_date IS NOT NULL
-      AND t.expected_payment_date IS NOT NULL
-      AND DATEDIFF(t.recovered_date, t.expected_payment_date) >= 0
+    WHERE DATE(t.expected_payment_date) &lt;= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        AND (t.transaction_amount != t.recovered_amount or t.recovered_date is null)
+        GROUP BY t.transaction_id
     """
 
     engine = create_engine("mysql+pymysql://root:Root123!@13.209.126.76:3306/recovery")
